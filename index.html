@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>これさえ知れば、Claudeを使いこなせる — シリーズ一覧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --bg2: #EDEAE2;
+    --ink: #1A1714;
+    --ink2: #4A4540;
+    --ink3: #7A7570;
+    --accent: #C85A2A;
+    --accent2: #E8832A;
+    --accent-light: #FAE8DC;
+    --teal: #2A7A6A;
+    --teal-light: #DDF0EB;
+    --blue: #2A4A8A;
+    --blue-light: #DDE4F5;
+    --gold: #B8860B;
+    --gold-light: #FDF5DC;
+    --border: #D4CFC5;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 16px;
+    min-height: 100vh;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--ink);
+    color: white;
+    padding: 100px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,90,42,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: 10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(42,122,106,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* 斜めのアクセントライン */
+  .hero-line {
+    position: absolute;
+    top: 0; right: 120px;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(200,90,42,0.3), transparent);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent2);
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 .accent { color: var(--accent2); }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.9;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: white;
+    line-height: 1;
+  }
+
+  .stat-num span {
+    font-size: 0.9rem;
+    color: var(--accent2);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== SERIES SECTION ===== */
+  .series-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 72px 40px 100px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ===== COURSE CARDS ===== */
+  .course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .course-card {
+    background: white;
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: stretch;
+    overflow: hidden;
+    transition: box-shadow 0.25s, transform 0.25s;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+
+  .course-card.available:hover {
+    box-shadow: 6px 6px 0 var(--accent-light);
+    transform: translate(-3px, -3px);
+    z-index: 1;
+  }
+
+  .course-card.locked {
+    opacity: 0.72;
+    cursor: default;
+  }
+
+  /* 左の番号帯 */
+  .course-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    padding: 28px 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .course-card.available .course-num { background: var(--ink); }
+  .course-card.locked .course-num { background: var(--bg2); }
+
+  .course-level {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .course-card.available .course-level { color: var(--accent2); }
+  .course-card.locked .course-level { color: var(--ink3); }
+
+  .course-num-big {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .course-card.available .course-num-big { color: white; }
+  .course-card.locked .course-num-big { color: var(--ink3); }
+
+  /* 中央のコンテンツ */
+  .course-body {
+    padding: 28px 32px;
+  }
+
+  .course-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .course-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  .tag-open { background: var(--teal-light); color: var(--teal); }
+  .tag-coming { background: var(--bg2); color: var(--ink3); }
+  .tag-gift { background: var(--accent-light); color: var(--accent); }
+
+  .course-title {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .course-card.locked .course-title { color: var(--ink3); }
+
+  .course-desc {
+    font-size: 13.5px;
+    color: var(--ink2);
+    line-height: 1.75;
+    margin-bottom: 16px;
+  }
+
+  .course-card.locked .course-desc { color: var(--ink3); }
+
+  .course-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .course-meta-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .course-meta-item .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .course-card.locked .course-meta-item .dot { background: var(--ink3); }
+
+  /* 右のCTAエリア */
+  .course-cta {
+    display: flex;
+    align-items: center;
+    padding: 28px 32px;
+    border-left: 1px solid var(--border);
+    min-width: 140px;
+    justify-content: center;
+  }
+
+  .btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 2px;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+
+  .btn-start:hover { background: var(--accent2); }
+
+  .btn-locked {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg2);
+    color: var(--ink3);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+  }
+
+  /* 章リスト */
+  .chapter-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .chapter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink2);
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .chapter-item:last-child { border-bottom: none; }
+
+  .chapter-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .course-card.locked .chapter-num { color: var(--ink3); }
+  .course-card.locked .chapter-item { color: var(--ink3); }
+
+  /* ===== WHAT YOU'LL GET ===== */
+  .benefits {
+    margin-top: 64px;
+    background: var(--ink);
+    color: white;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .benefits::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(200,90,42,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .benefits-title {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .benefit-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .benefit-icon { font-size: 24px; }
+
+  .benefit-title {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: white;
+  }
+
+  .benefit-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* ===== FAQ ===== */
+  .faq {
+    margin-top: 64px;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    gap: 16px;
+    user-select: none;
+  }
+
+  .faq-toggle {
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+    line-height: 1;
+  }
+
+  .faq-item.open .faq-toggle { transform: rotate(45deg); }
+
+  .faq-a {
+    display: none;
+    padding: 0 0 20px;
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.85;
+  }
+
+  .faq-item.open .faq-a { display: block; }
+
+  /* ===== CTA BANNER ===== */
+  .cta-banner {
+    margin-top: 64px;
+    background: linear-gradient(135deg, var(--accent-light), var(--gold-light));
+    border: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .cta-text h3 {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .cta-text p {
+    font-size: 13.5px;
+    color: var(--ink2);
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.4);
+    padding: 40px;
+    text-align: center;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  footer a { color: var(--accent2); text-decoration: none; }
+
+  /* ===== FADE IN ===== */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .hero { padding: 60px 20px 50px; }
+    .series-wrap { padding: 48px 20px 60px; }
+    .course-card { grid-template-columns: 60px 1fr; }
+    .course-cta { display: none; }
+    .course-body { padding: 20px; }
+    .benefits { padding: 32px 24px; }
+    .cta-banner { padding: 28px 24px; }
+  }
+
+  /* ===== STAGGER ANIMATION ===== */
+  .course-card:nth-child(1) { transition-delay: 0.05s; }
+  .course-card:nth-child(2) { transition-delay: 0.15s; }
+  .course-card:nth-child(3) { transition-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-line"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Claude 完全学習シリーズ</div>
+    <h1>これさえ知れば、<br><span class="accent">Claude</span>を使いこなせる</h1>
+    <p class="hero-sub">初級・中級・上級の3部構成で、AIアシスタントをビジネスに活かすスキルをゼロから体系的に身につける実践的学習シリーズ。</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">3<span>部作</span></div>
+        <div class="stat-label">Total Courses</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3<span>〜4時間</span></div>
+        <div class="stat-label">Total Duration</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0<span>円</span></div>
+        <div class="stat-label">初級編は無料</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SERIES ===== -->
+<div class="series-wrap">
+
+  <div class="section-label">シリーズ一覧 — Course List</div>
+
+  <div class="course-list">
+
+    <!-- 初級 -->
+    <a class="course-card available fade-in" href="./beginner/index.html">
+      <div class="course-num">
+        <div class="course-level">初級</div>
+        <div class="course-num-big">01</div>
+      </div>
+      <div class="course-body">
+        <div class="course-tag-row">
+          <span class="course-tag tag-open">🟢 公開中 — 無料</span>
+          <span class="course-tag tag-gift">🎁 プロンプトビルダー付き</span>
+        </div>
+        <div class="course-title">これさえ知れば、Claudeを使いこなせる ～初級～</div>
+        <div class="course-desc">Claudeの基本から、プロンプトの書き方まで。AIアシスタントをはじめて使う方でも、読み終わった瞬間から業務で使えるようになる入門編。</div>
+        <div class="chapter-list">
+          <div class="chapter-item"><span class="chapter-num">01</span>Claudeとは何か？</div>
+          <div class="chapter-item"><span class="chapter-num">02</span>他のAIとの違い（2026年3月最新版）</div>
+          <div class="chapter-item"><span class="chapter-num">03</span>できること・できないこと</div>
+          <div class="chapter-item"><span class="chapter-num">04</span>プロンプトの書き方入門 ＋ 実例ギャラリー</div>
+          <div class="chapter-item"><span class="chapter-num">05</span>演習ツール：プロンプトビルダー</div>
+          <div class="chapter-item"><span class="chapter-num">06</span>理解度チェッククイズ</div>
+        </div>
+        <div class="course-meta" style="margin-top:16px;">
+          <div class="course-meta-item"><div class="dot"></div>所要時間：約1時間</div>
+          <div class="course-meta-item"><div class="dot"></div>対象：どなたでも</div>
+          <div class="course-meta-item"><div class="dot"></div>クイズ：4問</div>
+        </div>
+      </div>
+      <div class="course-cta">
+        <span class="btn-start">読む →</span>
+      </div>
+    </a>
+
+    <!-- 中級 -->
+    <div class="course-card locked fade-in">
+      <div class="course-num">
+        <div class="course-level">中級</div>
+        <div class="course-num-big">02</div>
+      </div>
+      <div class="course-body">
+        <div class="course-tag-row">
+          <span class="course-tag tag-coming">🔒 近日公開</span>
+        </div>
+        <div class="course-title">これさえ知れば、Claudeを使いこなせる ～中級～</div>
+        <div class="course-desc">プロンプトエンジニアリングの本格的な技法から、業務ワークフローへの組み込み方まで。初級を終えた方が「もっと使いこなしたい」を叶える実践編。</div>
+        <div class="chapter-list">
+          <div class="chapter-item"><span class="chapter-num">01</span>プロンプトエンジニアリング中級技法</div>
+          <div class="chapter-item"><span class="chapter-num">02</span>業務別・シーン別プロンプト集</div>
+          <div class="chapter-item"><span class="chapter-num">03</span>長文・複数文書の処理テクニック</div>
+          <div class="chapter-item"><span class="chapter-num">04</span>Claudeとの会話を「育てる」方法</div>
+          <div class="chapter-item"><span class="chapter-num">05</span>他ツールとの連携活用</div>
+        </div>
+        <div class="course-meta" style="margin-top:16px;">
+          <div class="course-meta-item"><div class="dot"></div>所要時間：約1〜2時間</div>
+          <div class="course-meta-item"><div class="dot"></div>対象：初級修了者</div>
+        </div>
+      </div>
+      <div class="course-cta">
+        <span class="btn-locked">🔒 準備中</span>
+      </div>
+    </div>
+
+    <!-- 上級 -->
+    <div class="course-card locked fade-in">
+      <div class="course-num">
+        <div class="course-level">上級</div>
+        <div class="course-num-big">03</div>
+      </div>
+      <div class="course-body">
+        <div class="course-tag-row">
+          <span class="course-tag tag-coming">🔒 近日公開</span>
+        </div>
+        <div class="course-title">これさえ知れば、Claudeを使いこなせる ～上級～</div>
+        <div class="course-desc">API活用・自動化・エージェント機能まで。Claudeを「道具」から「戦力」に変える上級テクニック。エンジニアでなくても使いこなせる構成。</div>
+        <div class="chapter-list">
+          <div class="chapter-item"><span class="chapter-num">01</span>Claude APIの基礎と活用</div>
+          <div class="chapter-item"><span class="chapter-num">02</span>業務自動化・ワークフロー構築</div>
+          <div class="chapter-item"><span class="chapter-num">03</span>Claude Codeとエージェント機能入門</div>
+          <div class="chapter-item"><span class="chapter-num">04</span>セキュリティ・情報管理のベストプラクティス</div>
+          <div class="chapter-item"><span class="chapter-num">05</span>組織・チームへのClaude導入戦略</div>
+        </div>
+        <div class="course-meta" style="margin-top:16px;">
+          <div class="course-meta-item"><div class="dot"></div>所要時間：約2時間</div>
+          <div class="course-meta-item"><div class="dot"></div>対象：中級修了者</div>
+        </div>
+      </div>
+      <div class="course-cta">
+        <span class="btn-locked">🔒 準備中</span>
+      </div>
+    </div>
+
+  </div><!-- /course-list -->
+
+  <!-- ===== BENEFITS ===== -->
+  <div class="benefits fade-in">
+    <div class="benefits-title">このシリーズで得られること</div>
+    <div class="benefits-grid">
+      <div class="benefit-item">
+        <div class="benefit-icon">⚡</div>
+        <div class="benefit-title">即日から使える</div>
+        <div class="benefit-desc">理論だけでなく、読み終わったその日から業務に使えるプロンプトと演習ツールが付属します。</div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🎯</div>
+        <div class="benefit-title">ビジネス特化</div>
+        <div class="benefit-desc">メール・資料作成・情報整理など、実際のビジネスシーンを想定した実例が豊富です。</div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">📈</div>
+        <div class="benefit-title">段階的に深まる</div>
+        <div class="benefit-desc">初級→中級→上級の順番で読むことで、無理なくスキルが積み上がる設計になっています。</div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🔄</div>
+        <div class="benefit-title">常に最新情報</div>
+        <div class="benefit-desc">AIは進化が速い分野です。比較情報や機能説明は定期的に更新しています。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FAQ ===== -->
+  <div class="faq fade-in" style="margin-top:64px;">
+    <div class="section-label">よくある質問 — FAQ</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>Claudeを使ったことがなくても大丈夫ですか？</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">はい、初級編はClaude未経験の方を対象としています。アカウントの作り方から丁寧に説明しています。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>プログラミングの知識は必要ですか？</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">初級・中級編はプログラミング知識不要です。上級編でAPIに触れる箇所がありますが、コードの解説も含めていますので安心してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>初級編は本当に無料ですか？</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">はい、初級編はプロンプトビルダーを含めて完全無料です。中級・上級編は有料を予定しています。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>中級・上級はいつ公開されますか？</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">現在制作中です。公開時期はSNS（X / Threads）でお知らせします。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>ChatGPTは使えるのですが、Claudeも学ぶ必要がありますか？</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">ChatGPTとClaudeは得意分野が異なります。特に長文処理・日本語の自然さ・ビジネス文書においてClaudeは独自の強みを持っています。初級編の比較表で詳しく解説していますので、ぜひ確認してみてください。</div>
+    </div>
+
+  </div>
+
+  <!-- ===== CTA ===== -->
+  <div class="cta-banner fade-in">
+    <div class="cta-text">
+      <h3>まずは初級編から、無料ではじめましょう</h3>
+      <p>所要時間は約1時間。プロンプトビルダー付きで、読み終わった日から使えます。</p>
+    </div>
+    <a href="./beginner/index.html" class="btn-start" style="font-size:13px; padding:14px 28px;">初級編を読む →</a>
+  </div>
+
+</div><!-- /series-wrap -->
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>© 2026 これさえ知れば、Claudeを使いこなせる &nbsp;|&nbsp; Powered by <a href="https://anthropic.com" target="_blank">Anthropic</a> &nbsp;|&nbsp; <a href="https://claude.ai" target="_blank">claude.ai で試す</a></p>
+</footer>
+
+<script>
+// FAQ
+function toggleFaq(el) {
+  el.parentElement.classList.toggle('open');
+}
+
+// Fade in
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

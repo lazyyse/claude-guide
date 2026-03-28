@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>これさえ知れば、Claudeを使いこなせる ～初級～</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --bg2: #EDEAE2;
+    --ink: #1A1714;
+    --ink2: #4A4540;
+    --ink3: #7A7570;
+    --accent: #C85A2A;
+    --accent2: #E8832A;
+    --accent-light: #FAE8DC;
+    --teal: #2A7A6A;
+    --teal-light: #DDF0EB;
+    --blue: #2A4A8A;
+    --blue-light: #DDE4F5;
+    --gold: #B8860B;
+    --gold-light: #FDF5DC;
+    --border: #D4CFC5;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    z-index: 1000;
+    transition: width 0.1s;
+    width: 0%;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 80px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(200,90,42,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(42,122,106,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+
+  header h1 span {
+    color: var(--accent2);
+  }
+
+  .header-sub {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.65);
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-family: var(--mono);
+  }
+
+  .meta-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 3px;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .nav-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    font-size: 12.5px;
+    font-family: var(--mono);
+    color: var(--ink3);
+    text-decoration: none;
+    padding: 14px 18px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ===== TOC ===== */
+  .toc-wrap {
+    max-width: 860px;
+    margin: 48px auto 0;
+    padding: 0 40px;
+  }
+
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 32px 36px;
+  }
+
+  .toc h2 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 8px 32px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink2);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bg2);
+    transition: color 0.2s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    width: 22px;
+    flex-shrink: 0;
+  }
+
+  .toc-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    margin-left: auto;
+  }
+
+  /* ===== MAIN ===== */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  /* ===== SECTION ===== */
+  .section {
+    margin-bottom: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .section h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .section h3 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 36px 0 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h3::before {
+    content: '';
+    display: block;
+    width: 4px; height: 18px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p { margin-bottom: 16px; color: var(--ink2); }
+
+  strong { color: var(--ink); font-weight: 700; }
+
+  /* ===== CALLOUT ===== */
+  .callout {
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 2px;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  .callout-tip {
+    background: var(--teal-light);
+    border-left: 4px solid var(--teal);
+    color: #1A4A3A;
+  }
+
+  .callout-warn {
+    background: var(--gold-light);
+    border-left: 4px solid var(--gold);
+    color: #5A4000;
+  }
+
+  .callout-info {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    color: #1A2A5A;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  /* ===== CARDS ===== */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 24px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    box-shadow: 4px 4px 0 var(--accent-light);
+    transform: translate(-2px, -2px);
+  }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card h4 {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .card p {
+    font-size: 13px;
+    margin-bottom: 0;
+    line-height: 1.65;
+  }
+
+  /* ===== COMPARE TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 24px 0;
+    background: white;
+  }
+
+  .compare-table th {
+    background: var(--ink);
+    color: white;
+    padding: 14px 18px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .compare-table th:first-child { width: 160px; }
+
+  .compare-table td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink2);
+    vertical-align: top;
+  }
+
+  .compare-table tr:hover td { background: var(--bg2); }
+
+  .compare-table .feature-name {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 13px;
+  }
+
+  .tag-yes {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--teal);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .tag-no {
+    display: inline-block;
+    background: var(--bg2);
+    color: var(--ink3);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .tag-partial {
+    display: inline-block;
+    background: var(--gold-light);
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  /* ===== CAN / CANNOT ===== */
+  .can-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 600px) { .can-grid { grid-template-columns: 1fr; } }
+
+  .can-box, .cannot-box {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .can-box { border-top: 3px solid var(--teal); }
+  .cannot-box { border-top: 3px solid var(--accent); }
+
+  .can-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .can-title.green { color: var(--teal); }
+  .can-title.red { color: var(--accent); }
+
+  .can-list {
+    list-style: none;
+    font-size: 13.5px;
+  }
+
+  .can-list li {
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--border);
+    color: var(--ink2);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .can-list li:last-child { border-bottom: none; }
+
+  .can-list .mark {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ===== PROMPT BUILDER ===== */
+  .prompt-builder {
+    background: var(--ink);
+    color: white;
+    padding: 36px;
+    margin: 32px 0;
+    border-radius: 2px;
+  }
+
+  .prompt-builder h3 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    color: white;
+  }
+
+  .prompt-builder h3::before { background: var(--accent2) !important; }
+
+  .prompt-builder .sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 28px;
+  }
+
+  .prompt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    padding-top: 10px;
+    text-transform: uppercase;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    padding: 9px 14px;
+    font-family: var(--sans);
+    font-size: 14px;
+    border-radius: 2px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent2);
+    background: rgba(255,255,255,0.12);
+  }
+
+  .form-select option { background: #2A2520; color: white; }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  .btn-generate {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-start;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .btn-generate:hover { background: var(--accent2); }
+
+  .prompt-output {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-left: 3px solid var(--accent2);
+    padding: 20px;
+    display: none;
+  }
+
+  .prompt-output.visible { display: block; }
+
+  .prompt-output-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .prompt-text {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.85);
+    white-space: pre-wrap;
+  }
+
+  .btn-copy {
+    margin-top: 14px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.65);
+    padding: 7px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .btn-copy:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* ===== TEMPLATE CARDS ===== */
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .template-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .template-card:hover {
+    border-color: var(--accent);
+    box-shadow: 3px 3px 0 var(--accent-light);
+    transform: translate(-1px, -1px);
+  }
+
+  .template-card h4 {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .template-card p {
+    font-size: 12.5px;
+    margin-bottom: 12px;
+    line-height: 1.55;
+  }
+
+  .template-preview {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink3);
+    background: var(--bg2);
+    padding: 8px 10px;
+    border-radius: 2px;
+    line-height: 1.6;
+    overflow: hidden;
+    max-height: 72px;
+    position: relative;
+  }
+
+  .template-preview::after {
+    content: '…';
+    position: absolute;
+    bottom: 8px; right: 10px;
+    background: var(--bg2);
+    padding-left: 4px;
+  }
+
+  .use-template-btn {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: none;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .use-template-btn:hover { background: #FAD0B8; }
+
+  /* ===== QUIZ ===== */
+  .quiz {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin: 24px 0;
+  }
+
+  .quiz h4 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .quiz-question {
+    font-size: 14.5px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--ink);
+    padding: 14px 18px;
+    background: var(--bg2);
+    border-left: 3px solid var(--accent);
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.55;
+  }
+
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--teal); background: var(--teal-light); color: #1A4A3A; }
+  .quiz-option.wrong { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+  .quiz-opt-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg2);
+    padding: 2px 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .quiz-feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    display: none;
+    line-height: 1.65;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: var(--teal-light); border-left: 3px solid var(--teal); color: #1A4A3A; }
+  .quiz-feedback.ng { background: var(--accent-light); border-left: 3px solid var(--accent); color: #7A2A10; }
+
+  .quiz-next {
+    margin-top: 14px;
+    display: none;
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .quiz-next:hover { background: var(--accent); }
+  .quiz-next.show { display: inline-block; }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* ===== STEP LIST ===== */
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    padding-bottom: 28px;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .step-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .step-circle {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .step-connector {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    margin-top: 6px;
+    min-height: 20px;
+  }
+
+  .step:last-child .step-connector { display: none; }
+
+  .step-body h4 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  .step-body p { font-size: 13.5px; margin-bottom: 0; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.45);
+    padding: 40px;
+    text-align: center;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  footer a { color: var(--accent2); text-decoration: none; }
+
+  /* ===== HIGHLIGHT ===== */
+  mark {
+    background: var(--gold-light);
+    color: var(--ink);
+    padding: 1px 3px;
+    border-radius: 2px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    header { padding: 50px 20px 40px; }
+    .toc-wrap, main { padding-left: 20px; padding-right: 20px; }
+    .nav-inner { padding: 0 12px; }
+    .form-row { grid-template-columns: 1fr; }
+    .compare-table { font-size: 12px; }
+    .compare-table th, .compare-table td { padding: 10px 12px; }
+  }
+
+  /* ===== SCROLL ANIMATION ===== */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== SCENARIO BOX ===== */
+  .scenario {
+    background: white;
+    border: 1px solid var(--border);
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .scenario-header {
+    background: var(--bg2);
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .scenario-body {
+    padding: 20px;
+  }
+
+  .chat-bubble {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .chat-bubble.user { flex-direction: row-reverse; }
+
+  .chat-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .user .chat-avatar { background: var(--blue-light); }
+  .claude .chat-avatar { background: var(--accent-light); }
+
+  .chat-text {
+    max-width: 80%;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    border-radius: 2px;
+    color: var(--ink2);
+  }
+
+  .user .chat-text {
+    background: var(--blue-light);
+    border-radius: 2px 2px 2px 16px;
+  }
+
+  .claude .chat-text {
+    background: var(--bg2);
+    border-radius: 2px 2px 16px 2px;
+  }
+
+  .bad-prompt .chat-text { opacity: 0.6; }
+
+  .prompt-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 640px) { .prompt-comparison { grid-template-columns: 1fr; } }
+
+  .prompt-bad, .prompt-good {
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    font-family: var(--mono);
+  }
+
+  .prompt-bad {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    color: #7A2A10;
+  }
+
+  .prompt-good {
+    background: var(--teal-light);
+    border-left: 3px solid var(--teal);
+    color: #1A4A3A;
+  }
+
+  .prompt-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  /* ===== EXAMPLE GALLERY ===== */
+  .example-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .example-card {
+    background: white;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .example-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .example-header:hover { background: var(--bg2); }
+
+  .example-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .example-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-email { background: var(--blue-light); color: var(--blue); }
+  .badge-summary { background: var(--teal-light); color: var(--teal); }
+  .badge-idea { background: var(--gold-light); color: var(--gold); }
+
+  .example-title {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .example-toggle {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--ink3);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .example-card.open .example-toggle { transform: rotate(45deg); }
+
+  .example-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .example-card.open .example-body { display: block; }
+
+  .example-pane {
+    padding: 24px;
+  }
+
+  .example-pane + .example-pane {
+    border-top: 1px dashed var(--border);
+    background: var(--bg2);
+  }
+
+  .example-pane-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .example-pane-label.in { color: var(--accent); }
+  .example-pane-label.out { color: var(--teal); }
+
+  .example-prompt-text {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--ink2);
+    background: var(--bg);
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+    white-space: pre-wrap;
+  }
+
+  .example-output-text {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--ink2);
+    white-space: pre-wrap;
+  }
+
+  .example-output-text strong { color: var(--ink); }
+
+  .example-meta {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--accent-light);
+    border-radius: 2px;
+    font-size: 12.5px;
+    color: #7A3A10;
+    line-height: 1.65;
+  }
+
+  .example-meta b { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-inner">
+    <div class="badge">初級 / 中級 / 上級 — 3部構成シリーズ</div>
+    <h1>これさえ知れば、<span>Claude</span>を<br>使いこなせる <small style="font-size:0.55em; color:rgba(255,255,255,0.6); font-weight:300;">～初級～</small></h1>
+    <p class="header-sub">AIアシスタントをビジネスで使いこなすための、実践的な基礎知識</p>
+    <div class="header-meta">
+      <div class="meta-item"><div class="meta-dot"></div>所要時間：約1時間</div>
+      <div class="meta-item"><div class="meta-dot"></div>対象：どなたでも</div>
+      <div class="meta-item"><div class="meta-dot"></div>🎁 プロンプトビルダー付き</div>
+      <div class="meta-item"><div class="meta-dot"></div>対話式クイズ：あり</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-link" href="#sec1">01 Claudeとは</a>
+    <a class="nav-link" href="#sec2">02 AIの比較</a>
+    <a class="nav-link" href="#sec3">03 できること</a>
+    <a class="nav-link" href="#sec4">04 プロンプト入門</a>
+    <a class="nav-link" href="#sec5">05 演習ツール</a>
+    <a class="nav-link" href="#sec6">06 確認クイズ</a>
+  </div>
+</nav>
+
+<!-- ===== TOC ===== -->
+<div class="toc-wrap">
+  <div class="toc fade-in">
+    <h2>📋 目次</h2>
+    <div class="toc-grid">
+      <a href="#sec1" class="toc-item"><span class="toc-num">01</span>Claudeとは何か？<span class="toc-time">10分</span></a>
+      <a href="#sec2" class="toc-item"><span class="toc-num">02</span>他のAIとの違い<span class="toc-time">10分</span></a>
+      <a href="#sec3" class="toc-item"><span class="toc-num">03</span>できること・できないこと<span class="toc-time">10分</span></a>
+      <a href="#sec4" class="toc-item"><span class="toc-num">04</span>プロンプトの書き方入門<span class="toc-time">15分</span></a>
+      <a href="#sec5" class="toc-item"><span class="toc-num">05</span>演習ツール<span class="toc-time">10分</span></a>
+      <a href="#sec6" class="toc-item"><span class="toc-num">06</span>理解度チェッククイズ<span class="toc-time">5分</span></a>
+    </div>
+    <div style="margin-top:20px; padding:14px 18px; background:linear-gradient(135deg, var(--accent-light), var(--gold-light)); border:1px solid var(--border); border-radius:2px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <span style="font-size:22px;">🎁</span>
+      <div>
+        <div style="font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:3px;">特典付き</div>
+        <div style="font-size:14px; font-weight:700; color:var(--ink);">プロンプトビルダー</div>
+        <div style="font-size:12.5px; color:var(--ink2); margin-top:2px;">教材内で学んだプロンプトの型を使って、すぐに使えるプロンプトを自動生成できるツールです。学習後もずっと使い続けられます。</div>
+      </div>
+      <a href="#sec5" style="margin-left:auto; background:var(--accent); color:white; font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:8px 16px; text-decoration:none; border-radius:2px; white-space:nowrap; flex-shrink:0;">使ってみる →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+  <!-- SEC 1: Claudeとは -->
+  <section class="section fade-in" id="sec1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Claudeとは何か？</h2>
+    </div>
+
+    <p><strong>Claude（クロード）</strong>は、アメリカのAI安全研究企業<strong>Anthropic（アンソロピック）</strong>が開発した、大規模言語モデル（LLM）ベースのAIアシスタントです。2023年に一般公開され、現在は世界中のビジネス・研究・教育現場で広く使われています。</p>
+
+    <p>「AIと話す」というと難しそうに聞こえますが、Claudeとのやり取りは普通の日本語の文章で行います。メールを書く感覚で質問や依頼を入力するだけです。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">📌 Claudeの基本情報</div>
+      ClaudeはAnthropic社が開発し、<strong>claude.ai</strong> というWebサービスから無料で利用を開始できます。スマートフォンのアプリ（iOS/Android）も提供されており、PCとスマホどちらからでも使えます。
+    </div>
+
+    <h3>Claudeが生まれた背景</h3>
+    <p>Anthropicは「AIの安全性」を最優先に掲げて2021年に設立された会社です。創業者の多くは元OpenAI（ChatGPTを開発した会社）の研究者たちで、「AIを安全かつ有益に」するためにAnthropicを立ち上げました。</p>
+    <p>そのため、Claudeは設計の段階から<strong>誠実さ・安全性・人への配慮</strong>が組み込まれています。これは後の「できること・できないこと」の節でも詳しく説明します。</p>
+
+    <h3>どんな場面で使われているか</h3>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">📝</span>
+        <h4>文章の作成・編集</h4>
+        <p>メール、報告書、企画書、プレゼン資料など、ビジネス文書の下書きや校正に。</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔍</span>
+        <h4>情報の整理・要約</h4>
+        <p>長い文書や会議の議事録を短くまとめる、複数の情報を比較整理する作業に。</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">💡</span>
+        <h4>アイデア出し</h4>
+        <p>新規企画のアイデア、問題解決の方法、タイトル案など、ブレインストーミングの相手として。</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌐</span>
+        <h4>翻訳・言語サポート</h4>
+        <p>英語↔日本語の翻訳、表現の言い換え、文章の丁寧さ調整など。</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">💻</span>
+        <h4>コードの作成・説明</h4>
+        <p>ExcelのVBA、Pythonスクリプト、Webページ作成など、プログラミングのサポートに。</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧠</span>
+        <h4>学習・説明</h4>
+        <p>難しい概念をわかりやすく解説してもらったり、勉強の補助として使ったり。</p>
+      </div>
+    </div>
+
+    <h3>Claudeを使い始めるには</h3>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>claude.ai にアクセス</h4>
+          <p>ブラウザで <code>claude.ai</code> を開きます。PCでもスマホでも使えます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>アカウントを作成（無料）</h4>
+          <p>メールアドレスまたはGoogleアカウントで登録できます。クレジットカードは不要です。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>チャット画面でメッセージを入力</h4>
+          <p>画面下部の入力欄に日本語で話しかけるだけです。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">4</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>返答が来たら続けて会話</h4>
+          <p>「もう少し短くして」「別の言い方はある？」など、追加の指示も自然な文章でOKです。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">✅ ポイント</div>
+      無料プランでも十分な機能が使えます。より多くの会話量や高性能モデルが必要な場合は、有料プラン（Claude Pro）へのアップグレードが可能です。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 2: 他のAIとの違い -->
+  <section class="section fade-in" id="sec2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>他のAIとの違い</h2>
+    </div>
+
+    <p>「ChatGPTとどう違うの？」という質問をよく受けます。主要なAIアシスタントを比較してみましょう。それぞれに強みがあり、用途によって使い分けることも選択肢の一つです。</p>
+
+    <p style="font-size:13px; color:var(--ink3); margin-top:-8px;">※ 本表は2026年3月時点の情報をもとに作成しています。AIの仕様は頻繁にアップデートされるため、最新情報は各公式サイトでご確認ください。</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>比較項目</th>
+          <th>Claude</th>
+          <th>ChatGPT</th>
+          <th>Gemini</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name">開発元</td>
+          <td>Anthropic</td>
+          <td>OpenAI</td>
+          <td>Google</td>
+        </tr>
+        <tr>
+          <td class="feature-name">最新主要モデル<br>（2026年3月）</td>
+          <td>Opus 4.6 / Sonnet 4.6</td>
+          <td>GPT-5.4</td>
+          <td>Gemini 3.1 Pro</td>
+        </tr>
+        <tr>
+          <td class="feature-name">日本語対応</td>
+          <td><span class="tag-yes">◎ 非常に自然</span></td>
+          <td><span class="tag-yes">○ 高品質</span></td>
+          <td><span class="tag-partial">△ やや直訳調</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">長文処理</td>
+          <td><span class="tag-yes">◎ 非常に得意</span></td>
+          <td><span class="tag-yes">○ 得意</span></td>
+          <td><span class="tag-yes">◎ 100万トークン対応</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">安全性・倫理設計</td>
+          <td><span class="tag-yes">◎ 最重視</span></td>
+          <td><span class="tag-partial">○ 重視</span></td>
+          <td><span class="tag-partial">○ 重視</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Web検索</td>
+          <td><span class="tag-yes">○ 対応</span></td>
+          <td><span class="tag-yes">○ 対応</span></td>
+          <td><span class="tag-yes">◎ Google検索と深く統合</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">画像生成</td>
+          <td><span class="tag-no">— 非対応</span></td>
+          <td><span class="tag-yes">○ DALL-E / GPT Image</span></td>
+          <td><span class="tag-yes">◎ Nano Banana対応</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">動画生成</td>
+          <td><span class="tag-no">— 非対応</span></td>
+          <td><span class="tag-partial">△ Sora 2（制限あり）</span></td>
+          <td><span class="tag-yes">○ Veo 3.1対応</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">画像・文書の読み取り</td>
+          <td><span class="tag-yes">◎ 対応</span></td>
+          <td><span class="tag-yes">○ 対応</span></td>
+          <td><span class="tag-yes">○ 対応</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">AIエージェント機能</td>
+          <td><span class="tag-yes">◎ Claude Code / Cowork</span></td>
+          <td><span class="tag-yes">○ Codex（発展中）</span></td>
+          <td><span class="tag-partial">△ 開発者向けが中心</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">外部サービス連携</td>
+          <td><span class="tag-partial">○ MCP対応</span></td>
+          <td><span class="tag-yes">◎ エコシステム充実</span></td>
+          <td><span class="tag-yes">◎ Google Workspace直結</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">コーディング性能</td>
+          <td><span class="tag-yes">◎ 業界トップ評価</span></td>
+          <td><span class="tag-yes">○ 汎用性が高い</span></td>
+          <td><span class="tag-partial">○ Google系技術に強い</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">無料プランの充実度</td>
+          <td><span class="tag-yes">○ 充実</span></td>
+          <td><span class="tag-partial">△ 制限あり</span></td>
+          <td><span class="tag-yes">○ 充実</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ℹ️ Claudeが特に得意なこと（2026年3月時点）</div>
+      Claudeは<strong>長い文章の読み取り・要約・編集・コーディング</strong>が非常に得意です。2026年2月にリリースされたOpus 4.6 / Sonnet 4.6では長時間の自律タスク実行能力が大幅に向上しています。また、回答の「誠実さ」にも定評があり、わからないことは「わからない」と答える設計になっています。画像・動画生成はできませんが、<strong>日本語の自然さとビジネス文書の精度</strong>では3社の中で最も高い評価を得ています。
+    </div>
+
+    <h3>実際の会話例</h3>
+    <div class="scenario">
+      <div class="scenario-header">💼 ビジネスシーン例</div>
+      <div class="scenario-body">
+        <div class="chat-bubble user">
+          <div class="chat-avatar">👤</div>
+          <div class="chat-text">この50ページの契約書を読んで、特に注意すべき条項を3つ教えてください。</div>
+        </div>
+        <div class="chat-bubble claude">
+          <div class="chat-avatar">🤖</div>
+          <div class="chat-text">契約書を確認しました。特に注意が必要な条項は以下の3点です。<br><br>① 第12条「損害賠償の上限」— 上限額が発注額の10%と設定されており、一般的な水準より低い可能性があります。<br>② 第18条「知的財産権の帰属」— 成果物の権利が甲（発注者）に帰属しますが、制作過程で使用したツールや素材の権利については曖昧な表現があります。<br>③ 第24条「契約解除の条件」— 30日前の通知で一方的な解除が可能とされており、プロジェクト途中での中断リスクがあります。</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:var(--ink3); margin-top:-8px;">※ 上記はイメージです。実際の法的判断は専門家にご相談ください。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 3: できること・できないこと -->
+  <section class="section fade-in" id="sec3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>できること・できないこと</h2>
+    </div>
+
+    <p>Claudeは多くのことができますが、すべてに対応しているわけではありません。特にAIの安全性を重視するAnthropicの方針により、<mark>意図的に対応しない</mark>領域があります。「なぜできないのか」を理解することも、上手に使う上で大切です。</p>
+
+    <div class="can-grid">
+      <div class="can-box">
+        <div class="can-title green">✅ できること</div>
+        <ul class="can-list">
+          <li><span class="mark">📝</span>文章の作成・要約・校正・翻訳</li>
+          <li><span class="mark">💡</span>アイデア出し・ブレインストーミング</li>
+          <li><span class="mark">📊</span>データの分析・整理・比較</li>
+          <li><span class="mark">💻</span>プログラムコードの作成・修正</li>
+          <li><span class="mark">🖼️</span>画像・PDFの内容を読み取る</li>
+          <li><span class="mark">🌐</span>Webページの要約・情報収集</li>
+          <li><span class="mark">🔢</span>計算・数式の解説</li>
+          <li><span class="mark">🎭</span>ロールプレイ・創作文章</li>
+          <li><span class="mark">🗣️</span>議論の整理・論点の抽出</li>
+          <li><span class="mark">📚</span>学習のサポート・概念の説明</li>
+        </ul>
+      </div>
+      <div class="cannot-box">
+        <div class="can-title red">❌ できないこと・しないこと</div>
+        <ul class="can-list">
+          <li><span class="mark">🎨</span>画像・動画・音声の生成</li>
+          <li><span class="mark">📅</span>リアルタイムの最新情報取得（基本）</li>
+          <li><span class="mark">🔒</span>他のシステムやアカウントへのアクセス</li>
+          <li><span class="mark">⚠️</span>危険・違法な情報の提供</li>
+          <li><span class="mark">🚫</span>特定人物を傷つける内容の作成</li>
+          <li><span class="mark">📞</span>電話や外部への直接連絡</li>
+          <li><span class="mark">💾</span>会話履歴を自動で長期記憶（基本）</li>
+          <li><span class="mark">🔮</span>未来予測・投資アドバイス</li>
+          <li><span class="mark">👨‍⚕️</span>医師・弁護士・税理士の代替</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">⚠️ 重要：AIハルシネーションについて</div>
+      Claudeを含むすべてのAIは、<strong>もっともらしく見えるが事実ではない情報（ハルシネーション）を生成することがあります。</strong>特に統計データ・固有名詞・最新情報を含む回答は、必ず一次情報源で確認してください。重要な判断にAIの出力をそのまま使うことは避けましょう。
+    </div>
+
+    <h3>「できない」ことへの正しい期待値</h3>
+    <p>Claudeが断ったり、回答を保留することがあるのは<strong>わざとそう設計されているから</strong>です。例えば危険な情報の提供を求めると断りますが、これは製品の欠陥ではなく、安全性への投資です。</p>
+    <p>また、「わかりません」「確認が必要です」とClaudeが言う場合、それは正直に答えている証拠でもあります。Claudeは間違いを認め、訂正を受け入れる設計になっています。</p>
+    <p>なお、Claudeは<strong>意図的に嘘をつく設計にはなっていません</strong>。ただし前述のハルシネーションにより、結果的に誤った情報を返すことはあります。「意図的に偽る」ことと「誤った情報を生成してしまう」ことは別物として理解しておきましょう。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 4: プロンプト入門 -->
+  <section class="section fade-in" id="sec4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>プロンプトの書き方入門</h2>
+    </div>
+
+    <p><strong>プロンプト</strong>とは、Claudeに送る指示・質問のことです。プロンプトの書き方次第で、返ってくる答えの質が大きく変わります。「どう伝えるか」を少し意識するだけで、Claudeの力を何倍にも引き出せます。</p>
+
+    <h3>良いプロンプトの5原則</h3>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="step-line"><div class="step-circle">①</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>目的を明確に伝える</h4>
+          <p>「何のために使うか」を書くと、Claudeが適切な形式や内容で答えられます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">②</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>背景・文脈を提供する</h4>
+          <p>誰が・どんな状況で使うのかを伝えると精度が上がります。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">③</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>出力形式を指定する</h4>
+          <p>「箇条書きで」「3つ挙げて」「300字以内で」など、形式を指定すると使いやすい答えが返ってきます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">④</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>役割を与える（任意）</h4>
+          <p>「マーケターとして」「初心者向けに説明する先生として」など、Claudeに役割を与えると的確な視点が得られます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-line"><div class="step-circle">⑤</div><div class="step-connector"></div></div>
+        <div class="step-body">
+          <h4>会話を続けてブラッシュアップする</h4>
+          <p>一発で完璧でなくて構いません。「もっと短く」「よりフォーマルに」「別の角度からも考えて」と追加指示するだけで、どんどん理想に近づけられます。</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>悪いプロンプトと良いプロンプトの比較</h3>
+
+    <div class="prompt-comparison">
+      <div class="prompt-bad">
+        <div class="prompt-label">❌ 曖昧なプロンプト</div>
+        メールを書いて
+      </div>
+      <div class="prompt-good">
+        <div class="prompt-label">✅ 具体的なプロンプト</div>
+        取引先（山田商事・担当：鈴木様）へ、来週火曜日の打ち合わせ日程変更をお断りするビジネスメールを書いてください。理由は社内会議との重複です。敬語を使い、200字程度でまとめてください。
+      </div>
+    </div>
+
+    <div class="prompt-comparison">
+      <div class="prompt-bad">
+        <div class="prompt-label">❌ 曖昧なプロンプト</div>
+        この商品についてまとめて
+      </div>
+      <div class="prompt-good">
+        <div class="prompt-label">✅ 具体的なプロンプト</div>
+        以下の商品説明文を読んで、購買意欲を高めるためのキャッチコピー（20字以内）を5案提案してください。対象は30代の働く女性です。[商品説明文をここに貼る]
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">💡 プロのコツ：役割設定（ロールプロンプト）</div>
+      プロンプトの最初に <strong>「あなたは〇〇の専門家です」</strong> と書くと、その専門家の視点から回答してもらえます。例：「あなたはベテランの採用担当者です。以下の職務経歴書を評価してください。」
+    </div>
+
+    <h3>よく使うプロンプトパターン</h3>
+
+    <div class="template-grid">
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('summarize')">使う</button>
+        <h4>📄 文書要約</h4>
+        <p>長い文書を要点のみ整理する</p>
+        <div class="template-preview">以下の文章を読み、要点を3〜5つの箇条書きにまとめてください。各ポイントは1〜2文で...</div>
+      </div>
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('email')">使う</button>
+        <h4>📧 メール作成</h4>
+        <p>ビジネスメールの下書きを作る</p>
+        <div class="template-preview">以下の状況に合った丁寧なビジネスメールを書いてください。[宛先]：[目的]：[背景]...</div>
+      </div>
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('idea')">使う</button>
+        <h4>💡 アイデア出し</h4>
+        <p>課題解決のアイデアを大量に出す</p>
+        <div class="template-preview">〇〇という課題を解決するためのアイデアを10個提案してください。実現可能性より...</div>
+      </div>
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('translate')">使う</button>
+        <h4>🌐 翻訳・言い換え</h4>
+        <p>文章を翻訳・別の表現にする</p>
+        <div class="template-preview">以下の日本語文を自然なビジネス英語に翻訳してください。フォーマルなトーンで...</div>
+      </div>
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('review')">使う</button>
+        <h4>✏️ 文章レビュー</h4>
+        <p>書いた文章の問題点を指摘してもらう</p>
+        <div class="template-preview">以下の文章を読み、改善点を指摘してください。チェック項目：誤字脱字、論理の流れ...</div>
+      </div>
+      <div class="template-card">
+        <button class="use-template-btn" onclick="loadTemplate('explain')">使う</button>
+        <h4>📚 わかりやすく説明</h4>
+        <p>難しい概念を簡単に解説してもらう</p>
+        <div class="template-preview">〇〇について、業界未経験の新入社員でも理解できるように、具体例を使って...</div>
+      </div>
+    </div>
+
+    <h3>実例ギャラリー：こう入力したら、こう返ってきた</h3>
+
+    <p>テンプレートを試す前に、<strong>実際にどんな回答が返ってくるか</strong>を確認しておきましょう。以下は「良いプロンプトの5原則」を意識して書いた3つの実例です。各例をクリックすると、プロンプトと実際のアウトプットが展開されます。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ℹ️ この実例について</div>
+      以下はすべて実際にClaudeへ入力したプロンプトと、そのアウトプットです。<strong>あなたが同じプロンプトを入力しても、毎回まったく同じ回答にはなりません</strong>（AIは確率的に回答を生成するため）。ただし方向性や品質は同程度のものが返ってきます。「大体こんな感じ」という目安としてご覧ください。
+    </div>
+
+    <div class="example-gallery">
+
+      <!-- 例1: メール作成 -->
+      <div class="example-card" id="ex1">
+        <div class="example-header" onclick="toggleExample('ex1')">
+          <div class="example-header-left">
+            <span class="example-badge badge-email">📧 メール作成</span>
+            <span class="example-title">日程変更の断りメールを書いてもらう</span>
+          </div>
+          <span class="example-toggle">+</span>
+        </div>
+        <div class="example-body">
+          <div class="example-pane">
+            <div class="example-pane-label in">▶ あなたが入力したプロンプト</div>
+            <div class="example-prompt-text">取引先（山田商事・担当：鈴木様）へ、来週火曜日の打ち合わせ日程変更をお断りするビジネスメールを書いてください。理由は社内会議との重複です。敬語を使い、200字程度でまとめてください。</div>
+          </div>
+          <div class="example-pane">
+            <div class="example-pane-label out">◀ Claudeからの回答</div>
+            <div class="example-output-text">件名：来週火曜日の打ち合わせ日程についてのお願い
+
+山田商事
+鈴木様
+
+いつもお世話になっております。
+
+誠に恐れ入りますが、来週火曜日のお打ち合わせにつきまして、社内会議と日程が重複していることが判明いたしました。大変ご迷惑をおかけして申し訳ございませんが、日程の変更をご検討いただけますでしょうか。
+
+ご都合のよい日時をお知らせいただければ幸いです。何卒よろしくお願い申し上げます。</div>
+            <div class="example-meta">
+              <b>📌 ポイント：</b>件名・宛先・本文の構成が自動で整い、敬語も適切に使われています。「200字程度」と指定したため簡潔にまとまりました。さらに「別の候補日を3つ提示して」と追加指示することで、より実用的なメールに発展できます。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 例2: 文書要約 -->
+      <div class="example-card" id="ex2">
+        <div class="example-header" onclick="toggleExample('ex2')">
+          <div class="example-header-left">
+            <span class="example-badge badge-summary">📄 要約</span>
+            <span class="example-title">長い文章を要点だけ箇条書きにしてもらう</span>
+          </div>
+          <span class="example-toggle">+</span>
+        </div>
+        <div class="example-body">
+          <div class="example-pane">
+            <div class="example-pane-label in">▶ あなたが入力したプロンプト</div>
+            <div class="example-prompt-text">以下の文章を読み、要点を3〜5つの箇条書きにまとめてください。各ポイントは1〜2文でまとめてください。
+
+【文章】
+生成AIの普及により、ビジネスのあり方が急速に変わりつつある。特に文章作成や情報整理といった知識労働の分野では、AIが人間の作業を大幅に補助できるようになった。一方で、AIが生成した情報の正確性を確認する「ファクトチェック」の重要性も増している。AIは事実に見えるが誤った情報（ハルシネーション）を生成することがあるため、重要な判断にはかならず一次情報源の確認が必要だ。また、AIをうまく活用するには「プロンプト（指示文）」の書き方が鍵となる。具体的で明確な指示を与えるほど、AIの出力精度が上がる。</div>
+          </div>
+          <div class="example-pane">
+            <div class="example-pane-label out">◀ Claudeからの回答</div>
+            <div class="example-output-text">• <strong>AIが知識労働を大きく変えている。</strong>文章作成や情報整理などの分野で、AIが人間の作業を大幅に補助できる時代になった。
+
+• <strong>ファクトチェックが不可欠。</strong>AIはハルシネーション（事実に見えるが誤った情報の生成）を起こすことがあるため、重要な判断をする際は必ず一次情報源での確認が必要だ。
+
+• <strong>プロンプトの質が出力精度を左右する。</strong>AIへの指示文（プロンプト）は具体的・明確であるほど、精度の高い回答が得られる。</div>
+            <div class="example-meta">
+              <b>📌 ポイント：</b>「3〜5つ」という幅を持たせた指定で、内容に応じて適切な数にまとめてくれました。「各ポイントは1〜2文で」という形式指定が効いており、長くなりすぎず読みやすい箇条書きになっています。元の文章がどれだけ長くても、この形式で要約を依頼できます。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 例3: アイデア出し -->
+      <div class="example-card" id="ex3">
+        <div class="example-header" onclick="toggleExample('ex3')">
+          <div class="example-header-left">
+            <span class="example-badge badge-idea">💡 アイデア出し</span>
+            <span class="example-title">社内AI活用促進の施策を考えてもらう</span>
+          </div>
+          <span class="example-toggle">+</span>
+        </div>
+        <div class="example-body">
+          <div class="example-pane">
+            <div class="example-pane-label in">▶ あなたが入力したプロンプト</div>
+            <div class="example-prompt-text">社内のClaude活用を促進するための施策アイデアを5つ提案してください。対象は「AIに興味はあるが使ったことがない」ビジネスパーソンです。番号付きリストで、各アイデアに2〜3文の説明を加えてください。</div>
+          </div>
+          <div class="example-pane">
+            <div class="example-pane-label out">◀ Claudeからの回答</div>
+            <div class="example-output-text"><strong>1. 「5分でできる！Claude体験コーナー」の設置</strong>
+休憩室や共用スペースに専用PCを1台置き、誰でも気軽に試せる環境を作ります。「こう入力してみよう」という例文カードを隣に置くことで、初めての人でも迷わず体験できます。
+
+<strong>2. 業務別の「使える場面マップ」の作成・配布</strong>
+営業・総務・人事など部署ごとに「こんな業務に使えます」を一枚のA4シートにまとめます。抽象的な説明より「自分の仕事で使えそう」と思わせることが導入の第一歩です。
+
+<strong>3. 週1回の「AI活用事例シェア会（15分）」の開催</strong>
+実際にClaudeを使った社員が「こんなことに使ったら便利だった」を短く共有する場を設けます。成功体験の口コミが最も強力な普及ドライバーになります。
+
+<strong>4. 上司・マネージャーへの先行体験セッションの実施</strong>
+まずマネージャー層がClaudeを体験し、チームへの使用を後押しできる状態を作ります。「上が使っている」という空気が、部下の利用ハードルを大きく下げます。
+
+<strong>5. 「今日の業務をClaudeに頼んでみる」チャレンジの実施</strong>
+1週間限定で、毎日1つだけ業務タスクをClaudeに依頼することを推奨するキャンペーンを行います。強制ではなく「試してみる文化」を育てることが長期的な定着につながります。</div>
+            <div class="example-meta">
+              <b>📌 ポイント：</b>「対象：AIに興味はあるが使ったことがない人」という背景情報を加えたことで、初心者向けの現実的な施策が出てきました。「番号付きリスト＋各2〜3文」という形式指定で、そのまま会議資料に使えるレベルの出力になっています。ターゲット像を具体的に書くほど、的外れな提案が減ります。
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /example-gallery -->
+
+    <div class="callout callout-tip">
+      <div class="callout-title">💡 実例を見て気づいてほしいこと</div>
+      3つの例に共通するのは「<strong>目的・対象・形式</strong>」がプロンプトに含まれている点です。「メールを書いて」だけでは上記のような出力にはなりません。次のセクションで、あなた自身のプロンプトを組み立ててみましょう。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 5: 演習ツール -->
+  <section class="section fade-in" id="sec5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>演習ツール：プロンプトビルダー</h2>
+    </div>
+
+    <p>学んだ「良いプロンプトの5原則」を使って、実際にプロンプトを組み立ててみましょう。各フィールドに入力すると、Claudeに送れるプロンプトが自動生成されます。</p>
+
+    <div class="prompt-builder">
+      <h3>🛠 プロンプトビルダー</h3>
+      <p class="sub">以下を入力して「プロンプトを生成」ボタンを押してください</p>
+
+      <div class="prompt-form">
+        <div class="form-row">
+          <label class="form-label">タスク種別</label>
+          <select class="form-select" id="task-type">
+            <option value="">選択してください</option>
+            <option value="write">文章を書く</option>
+            <option value="summarize">要約する</option>
+            <option value="translate">翻訳する</option>
+            <option value="review">レビュー・改善</option>
+            <option value="idea">アイデアを出す</option>
+            <option value="explain">説明・解説する</option>
+            <option value="analyze">分析する</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">対象・内容</label>
+          <input class="form-input" id="target" type="text" placeholder="例：取引先へのお礼メール、決算報告書、英語のニュース記事">
+        </div>
+        <div class="form-row">
+          <label class="form-label">使用目的</label>
+          <input class="form-input" id="purpose" type="text" placeholder="例：上司への報告用、社内共有資料、SNS投稿">
+        </div>
+        <div class="form-row">
+          <label class="form-label">出力形式</label>
+          <select class="form-select" id="format">
+            <option value="">指定なし</option>
+            <option value="bullet">箇条書き</option>
+            <option value="numbered">番号付きリスト</option>
+            <option value="paragraph">文章形式（段落）</option>
+            <option value="table">表形式</option>
+            <option value="short">短く（200字以内）</option>
+            <option value="long">詳しく（800字以上）</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">トーン</label>
+          <select class="form-select" id="tone">
+            <option value="">指定なし</option>
+            <option value="formal">フォーマル（敬語）</option>
+            <option value="casual">カジュアル</option>
+            <option value="technical">専門的</option>
+            <option value="friendly">親しみやすい</option>
+            <option value="simple">簡潔・シンプル</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">補足情報</label>
+          <textarea class="form-textarea" id="extra" placeholder="任意：背景情報、制約条件、具体的な要望など。ここが詳しいほど精度が上がります。"></textarea>
+        </div>
+
+        <button class="btn-generate" onclick="generatePrompt()">▶ プロンプトを生成</button>
+      </div>
+
+      <div class="prompt-output" id="prompt-output">
+        <div class="prompt-output-label">Generated Prompt</div>
+        <div class="prompt-text" id="prompt-result"></div>
+        <button class="btn-copy" onclick="copyPrompt()">⧉ コピーする</button>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">📋 使い方</div>
+      上で生成したプロンプトをコピーして、<a href="https://claude.ai" target="_blank" style="color:var(--teal);">claude.ai</a> の入力欄に貼り付けて実際に試してみましょう。上手くいかない場合は、補足情報を追加してプロンプトを再生成してください。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 6: クイズ -->
+  <section class="section fade-in" id="sec6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>理解度チェッククイズ</h2>
+    </div>
+
+    <p>ここまで学んだ内容を確認しましょう。4問のクイズに答えてください。</p>
+
+    <!-- Quiz 1 -->
+    <div class="quiz" id="quiz1">
+      <h4>理解度チェック</h4>
+      <div class="quiz-question">Q1. Claudeを開発している会社の名前はどれですか？</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="answer(1, this, false)">
+          <span class="quiz-opt-label">A</span>OpenAI（オープンAI）
+        </div>
+        <div class="quiz-option" onclick="answer(1, this, true)">
+          <span class="quiz-opt-label">B</span>Anthropic（アンソロピック）
+        </div>
+        <div class="quiz-option" onclick="answer(1, this, false)">
+          <span class="quiz-opt-label">C</span>Google DeepMind
+        </div>
+        <div class="quiz-option" onclick="answer(1, this, false)">
+          <span class="quiz-opt-label">D</span>Meta AI
+        </div>
+      </div>
+      <div class="quiz-feedback" id="quiz1-feedback"></div>
+      <button class="quiz-next" id="quiz1-next" onclick="showNext(2)">次の問題へ →</button>
+    </div>
+
+    <!-- Quiz 2 -->
+    <div class="quiz" id="quiz2" style="display:none;">
+      <h4>理解度チェック</h4>
+      <div class="quiz-question">Q2. 良いプロンプトの要素として<strong>正しくないもの</strong>はどれですか？</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="answer(2, this, false)">
+          <span class="quiz-opt-label">A</span>目的を明確に伝える
+        </div>
+        <div class="quiz-option" onclick="answer(2, this, false)">
+          <span class="quiz-opt-label">B</span>出力形式を指定する
+        </div>
+        <div class="quiz-option" onclick="answer(2, this, true)">
+          <span class="quiz-opt-label">C</span>できるだけ短く・単語のみで伝える
+        </div>
+        <div class="quiz-option" onclick="answer(2, this, false)">
+          <span class="quiz-opt-label">D</span>背景・文脈を提供する
+        </div>
+      </div>
+      <div class="quiz-feedback" id="quiz2-feedback"></div>
+      <button class="quiz-next" id="quiz2-next" onclick="showNext(3)">次の問題へ →</button>
+    </div>
+
+    <!-- Quiz 3 -->
+    <div class="quiz" id="quiz3" style="display:none;">
+      <h4>理解度チェック</h4>
+      <div class="quiz-question">Q3. Claudeにできないこと（または意図的にしないこと）はどれですか？</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="answer(3, this, false)">
+          <span class="quiz-opt-label">A</span>英語を日本語に翻訳する
+        </div>
+        <div class="quiz-option" onclick="answer(3, this, false)">
+          <span class="quiz-opt-label">B</span>長い文書を要約する
+        </div>
+        <div class="quiz-option" onclick="answer(3, this, true)">
+          <span class="quiz-opt-label">C</span>画像や動画を生成する
+        </div>
+        <div class="quiz-option" onclick="answer(3, this, false)">
+          <span class="quiz-opt-label">D</span>プログラムコードを書く
+        </div>
+      </div>
+      <div class="quiz-feedback" id="quiz3-feedback"></div>
+      <button class="quiz-next" id="quiz3-next" onclick="showNext(4)">次の問題へ →</button>
+    </div>
+
+    <!-- Quiz 4 -->
+    <div class="quiz" id="quiz4" style="display:none;">
+      <h4>理解度チェック</h4>
+      <div class="quiz-question">Q4. AIが「もっともらしく見えるが事実でない情報」を生成してしまう現象を何と呼びますか？</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="answer(4, this, false)">
+          <span class="quiz-opt-label">A</span>ディープフェイク
+        </div>
+        <div class="quiz-option" onclick="answer(4, this, false)">
+          <span class="quiz-opt-label">B</span>オーバーフィッティング
+        </div>
+        <div class="quiz-option" onclick="answer(4, this, true)">
+          <span class="quiz-opt-label">C</span>ハルシネーション
+        </div>
+        <div class="quiz-option" onclick="answer(4, this, false)">
+          <span class="quiz-opt-label">D</span>バイアス
+        </div>
+      </div>
+      <div class="quiz-feedback" id="quiz4-feedback"></div>
+      <button class="quiz-next" id="quiz4-next" onclick="showResult()">結果を見る →</button>
+    </div>
+
+    <!-- Result -->
+    <div id="quiz-result" style="display:none; background: var(--ink); color:white; padding:36px; text-align:center;">
+      <div id="result-score" style="font-family:var(--mono); font-size:3rem; font-weight:700; color:var(--accent2); margin-bottom:12px;"></div>
+      <div id="result-msg" style="font-family:var(--serif); font-size:1.2rem; margin-bottom:20px;"></div>
+      <div id="result-sub" style="font-size:13px; color:rgba(255,255,255,0.55); margin-bottom:28px;"></div>
+      <button onclick="resetQuiz()" style="background:var(--accent); color:white; border:none; padding:12px 28px; font-family:var(--mono); font-size:12px; cursor:pointer; border-radius:2px; letter-spacing:0.08em; text-transform:uppercase;">もう一度挑戦</button>
+    </div>
+  </section>
+
+  <!-- WRAP UP -->
+  <div class="callout callout-tip" style="margin-top:40px;">
+    <div class="callout-title">🎉 初級編 完了！</div>
+    おつかれさまでした。この教材で学んだことを活かして、ぜひ実際にClaudeを使ってみてください。次は<strong>中級編</strong>で、より実践的なプロンプトエンジニアリングと業務応用について学びます。
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>© 2026 Claude 入門ガイド — 初級編 &nbsp;|&nbsp; Powered by <a href="https://anthropic.com" target="_blank">Anthropic</a> &nbsp;|&nbsp; <a href="https://claude.ai" target="_blank">claude.ai で試す</a></p>
+</footer>
+
+<script>
+// ===== EXAMPLE ACCORDION =====
+function toggleExample(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+}
+
+// ===== PROGRESS BAR =====
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// ===== FADE IN =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ===== NAV ACTIVE =====
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) cur = s.id;
+  });
+  navLinks.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+  });
+});
+
+// ===== PROMPT BUILDER =====
+const taskMap = {
+  write: '作成してください',
+  summarize: 'を要約してください',
+  translate: 'を翻訳してください',
+  review: 'をレビューして改善点を指摘してください',
+  idea: 'に関するアイデアを出してください',
+  explain: 'をわかりやすく説明してください',
+  analyze: 'を分析してください'
+};
+const formatMap = {
+  bullet: '箇条書き形式で',
+  numbered: '番号付きリストで',
+  paragraph: '段落形式の文章で',
+  table: '表形式で',
+  short: '200字以内で簡潔に',
+  long: '詳しく（800字以上で）'
+};
+const toneMap = {
+  formal: 'フォーマルな敬語を使い、',
+  casual: 'カジュアルで親しみやすいトーンで、',
+  technical: '専門的な用語を使って、',
+  friendly: '親しみやすく温かいトーンで、',
+  simple: 'できるだけシンプルに、'
+};
+
+function generatePrompt() {
+  const type = document.getElementById('task-type').value;
+  const target = document.getElementById('target').value.trim();
+  const purpose = document.getElementById('purpose').value.trim();
+  const format = document.getElementById('format').value;
+  const tone = document.getElementById('tone').value;
+  const extra = document.getElementById('extra').value.trim();
+
+  if (!type || !target) {
+    alert('「タスク種別」と「対象・内容」は必須です。');
+    return;
+  }
+
+  let prompt = '';
+  const toneStr = toneMap[tone] || '';
+  const formatStr = formatMap[format] ? formatMap[format] + '出力してください。' : '';
+
+  if (type === 'write') {
+    prompt += `以下の条件で${target}${taskMap[type]}。\n\n`;
+  } else {
+    prompt += `以下の${target}${taskMap[type]}。\n\n`;
+  }
+
+  if (purpose) prompt += `【目的】${purpose}\n`;
+  if (toneStr) prompt += `【トーン】${toneStr.replace('、', '')}\n`;
+  if (formatStr) prompt += `【形式】${formatMap[format]}\n`;
+  if (extra) prompt += `\n【補足・条件】\n${extra}\n`;
+  if (!formatStr) prompt += `\n回答は読みやすく整理して出力してください。`;
+
+  document.getElementById('prompt-result').textContent = prompt;
+  const out = document.getElementById('prompt-output');
+  out.classList.add('visible');
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyPrompt() {
+  const txt = document.getElementById('prompt-result').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✓ コピーしました！';
+    setTimeout(() => { btn.textContent = '⧉ コピーする'; }, 2000);
+  });
+}
+
+// ===== TEMPLATE LOAD =====
+const templates = {
+  summarize: { type: 'summarize', target: '以下の文章', purpose: '要点の把握・共有用', format: 'bullet', tone: 'simple', extra: '重要なポイントを3〜5つに絞ってまとめてください。' },
+  email: { type: 'write', target: 'ビジネスメール', purpose: '取引先への連絡', format: 'paragraph', tone: 'formal', extra: '[宛先]：\n[目的]：\n[補足]：' },
+  idea: { type: 'idea', target: '〇〇という課題', purpose: 'ブレインストーミング', format: 'numbered', tone: 'casual', extra: '実現可能性よりも独創性を重視して、10個提案してください。' },
+  translate: { type: 'translate', target: '以下の日本語文', purpose: 'ビジネス英語への翻訳', format: 'paragraph', tone: 'formal', extra: '自然な英語表現を心がけてください。' },
+  review: { type: 'review', target: '以下の文章', purpose: '品質改善', format: 'bullet', tone: 'friendly', extra: 'チェック項目：誤字脱字、論理の流れ、わかりやすさ' },
+  explain: { type: 'explain', target: '〇〇（専門用語・概念）', purpose: '社内勉強会の説明資料', format: 'paragraph', tone: 'simple', extra: '業界未経験の新入社員でも理解できるよう、具体例を交えて説明してください。' }
+};
+
+function loadTemplate(key) {
+  const t = templates[key];
+  document.getElementById('task-type').value = t.type;
+  document.getElementById('target').value = t.target;
+  document.getElementById('purpose').value = t.purpose;
+  document.getElementById('format').value = t.format;
+  document.getElementById('tone').value = t.tone;
+  document.getElementById('extra').value = t.extra;
+  document.getElementById('sec5').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== QUIZ =====
+let scores = 0;
+const feedbacks = {
+  1: { ok: '正解！Anthropicは2021年に設立されたAI安全研究企業で、元OpenAIの研究者たちが中心となって設立しました。', ng: '不正解。Claudeを開発しているのは<strong>Anthropic（アンソロピック）</strong>です。ChatGPTはOpenAI、GeminiはGoogle、LLaMAはMetaが開発しています。' },
+  2: { ok: '正解！「短く・単語のみ」では文脈や目的が伝わりません。良いプロンプトは具体的で、目的・背景・形式が含まれています。', ng: '不正解。正解はC「できるだけ短く・単語のみで伝える」です。これは良いプロンプトの要素ではありません。具体的な目的・背景・形式を伝えることが重要です。' },
+  3: { ok: '正解！Claudeは現時点で画像・動画・音声の<strong>生成</strong>には対応していません。ただし、画像を「読み取る・解析する」ことは可能です。', ng: '不正解。正解はC「画像や動画を生成する」です。翻訳・要約・コード作成はすべてClaudeの得意分野です。' },
+  4: { ok: '正解！<strong>ハルシネーション（Hallucination）</strong>は、AIが事実でない情報を自信を持って生成してしまう現象です。特に統計・固有名詞・最新情報には注意が必要です。', ng: '不正解。正解はC<strong>ハルシネーション</strong>です。AIが「もっともらしいが嘘の情報」を生成する現象を指します。重要な情報は必ず一次情報源で確認しましょう。' }
+};
+
+function answer(qNum, el, isCorrect) {
+  const options = document.querySelectorAll(`#quiz${qNum} .quiz-option`);
+  options.forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    options.forEach(o => { if (o.onclick.toString().includes('true')) o.classList.add('correct'); });
+  }
+  if (isCorrect) scores++;
+  const fb = document.getElementById(`quiz${qNum}-feedback`);
+  fb.innerHTML = isCorrect
+    ? '✅ ' + feedbacks[qNum].ok
+    : '❌ ' + feedbacks[qNum].ng;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'ng');
+  document.getElementById(`quiz${qNum}-next`).classList.add('show');
+}
+
+function showNext(n) {
+  document.getElementById('quiz' + (n-1)).style.display = 'none';
+  const next = document.getElementById('quiz' + n);
+  if (next) { next.style.display = 'block'; next.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+}
+
+function showResult() {
+  document.getElementById('quiz4').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.style.display = 'block';
+  res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('result-score').textContent = scores + ' / 4';
+  const msgs = [
+    ['もう一度復習してみましょう', 'セクション1〜3を読み返してみてください。理解が深まると次回は違う結果になるはずです！'],
+    ['もう少しです！', '惜しい！どの問題を間違えたか確認して、該当のセクションを読み返してみましょう。'],
+    ['よくできました！', '基本的な内容をしっかり理解できています。残り1問を確認してみましょう。'],
+    ['よくできました！', '基本的な内容をしっかり理解できています。残り1問を確認してみましょう。'],
+    ['パーフェクト！🎉', 'すべて正解です！初級編の内容を完全に理解しています。中級編に進む準備ができています。']
+  ];
+  const m = msgs[scores];
+  document.getElementById('result-msg').textContent = m[0];
+  document.getElementById('result-sub').textContent = m[1];
+}
+
+function resetQuiz() {
+  scores = 0;
+  document.getElementById('quiz-result').style.display = 'none';
+  [1,2,3,4].forEach(n => {
+    const q = document.getElementById('quiz' + n);
+    q.style.display = n === 1 ? 'block' : 'none';
+    q.querySelectorAll('.quiz-option').forEach(o => {
+      o.className = 'quiz-option';
+      o.style.pointerEvents = '';
+    });
+    document.getElementById('quiz' + n + '-feedback').className = 'quiz-feedback';
+    document.getElementById('quiz' + n + '-next').className = 'quiz-next';
+  });
+  document.getElementById('quiz1').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>
