@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F7F4EE;
+      --bg2: #EDEAE2;
+      --ink: #1A1714;
+      --ink2: #4A4540;
+      --ink3: #7A7570;
+      --accent: #2A4A8A;
+      --accent-light: #DDE4F5;
+      --teal: #2A7A6A;
+      --teal-light: #DDF0EB;
+      --border: #D4CFC5;
+      --sans: 'Noto Sans JP', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow: hidden; }
+    body { font-family: var(--sans); background: white; padding: 32px 40px 40px; color: var(--ink); }
+
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent);
+      font-family: var(--sans);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: white;
+    }
+
+    th {
+      background: var(--ink);
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink2);
+      vertical-align: top;
+      line-height: 1.65;
+    }
+
+    tr:hover td { background: var(--bg2); }
+
+    td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 12.5px;
+      white-space: nowrap;
+    }
+
+    .role-tag {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .prompt-text {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink2);
+      background: var(--bg);
+      padding: 6px 10px;
+      border-left: 2px solid var(--accent);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .effect {
+      font-size: 12px;
+      color: var(--teal);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">役割指定（ロールプロンプト）実例6選</div>
+  <table>
+    <thead>
+      <tr>
+        <th>用途</th>
+        <th>役割指定の例</th>
+        <th>効果</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ビジネスメール</td>
+        <td>
+          <div class="prompt-text">あなたは15年のキャリアを持つ<br>ベテラン秘書です。</div>
+        </td>
+        <td><div class="effect">丁寧・簡潔・ビジネス敬語が安定する</div></td>
+      </tr>
+      <tr>
+        <td>専門的な説明</td>
+        <td>
+          <div class="prompt-text">あなたはIT未経験者に教える<br>わかりやすい先生です。</div>
+        </td>
+        <td><div class="effect">専門用語を避け、例え話が増える</div></td>
+      </tr>
+      <tr>
+        <td>戦略・提案</td>
+        <td>
+          <div class="prompt-text">マッキンゼーの戦略コンサルタントとして、<br>論理的・簡潔に回答してください。</div>
+        </td>
+        <td><div class="effect">MECE・ピラミッド構造で整理される</div></td>
+      </tr>
+      <tr>
+        <td>採用・人事</td>
+        <td>
+          <div class="prompt-text">あなたは採用経験15年の<br>人事部長です。</div>
+        </td>
+        <td><div class="effect">評価基準・面接観点が実務的になる</div></td>
+      </tr>
+      <tr>
+        <td>批判的レビュー</td>
+        <td>
+          <div class="prompt-text">私のビジネスプランに懐疑的な<br>投資家として、弱点を指摘してください。</div>
+        </td>
+        <td><div class="effect">盲点・リスクを発見できる</div></td>
+      </tr>
+      <tr>
+        <td>コンテンツ作成</td>
+        <td>
+          <div class="prompt-text">ターゲット読者に深く刺さる文章を書く<br>プロのコピーライターです。</div>
+        </td>
+        <td><div class="effect">読者視点・感情に訴える表現が増える</div></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F7F4EE;
+      --bg2: #EDEAE2;
+      --ink: #1A1714;
+      --ink2: #4A4540;
+      --ink3: #7A7570;
+      --teal: #2A7A6A;
+      --teal-light: #DDF0EB;
+      --gold: #B8860B;
+      --gold-light: #FDF5DC;
+      --border: #D4CFC5;
+      --sans: 'Noto Sans JP', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow: hidden; }
+
+    body {
+      font-family: var(--sans);
+      background: white;
+      padding: 32px 40px 40px;
+      color: var(--ink);
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      border-radius: 4px;
+      background: white;
+    }
+
+    .compare-table th {
+      background: var(--ink);
+      color: white;
+      padding: 14px 18px;
+      text-align: left;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .compare-table th:first-child { width: 160px; }
+
+    .compare-table td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink2);
+      vertical-align: middle;
+    }
+
+    .compare-table tr:hover td { background: var(--bg2); }
+
+    .compare-table .feature-name {
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .tag-yes {
+      display: inline-block;
+      background: var(--teal-light);
+      color: var(--teal);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+
+    .tag-no {
+      display: inline-block;
+      background: var(--bg2);
+      color: var(--ink3);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    .tag-partial {
+      display: inline-block;
+      background: var(--gold-light);
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--ink3);
+      margin-bottom: 12px;
+      font-family: var(--sans);
+    }
+  </style>
+</head>
+<body>
+  <p class="note">※ 本表は2026年3月時点の情報をもとに作成しています。AIの仕様は頻繁にアップデートされるため、最新情報は各公式サイトでご確認ください。</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>比較項目</th>
+        <th>Claude</th>
+        <th>ChatGPT</th>
+        <th>Gemini</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feature-name">開発元</td>
+        <td>Anthropic</td>
+        <td>OpenAI</td>
+        <td>Google</td>
+      </tr>
+      <tr>
+        <td class="feature-name">最新主要モデル<br>（2026年3月）</td>
+        <td>Opus 4.6 / Sonnet 4.6</td>
+        <td>GPT-5.4</td>
+        <td>Gemini 3.1 Pro</td>
+      </tr>
+      <tr>
+        <td class="feature-name">日本語対応</td>
+        <td><span class="tag-yes">◎ 非常に自然</span></td>
+        <td><span class="tag-yes">○ 高品質</span></td>
+        <td><span class="tag-partial">△ やや直訳調</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">長文処理</td>
+        <td><span class="tag-yes">◎ 非常に得意</span></td>
+        <td><span class="tag-yes">○ 得意</span></td>
+        <td><span class="tag-yes">◎ 100万トークン対応</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">安全性・倫理設計</td>
+        <td><span class="tag-yes">◎ 最重視</span></td>
+        <td><span class="tag-partial">○ 重視</span></td>
+        <td><span class="tag-partial">○ 重視</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">Web検索</td>
+        <td><span class="tag-yes">○ 対応</span></td>
+        <td><span class="tag-yes">○ 対応</span></td>
+        <td><span class="tag-yes">◎ Google検索と深く統合</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">画像生成</td>
+        <td><span class="tag-no">— 非対応</span></td>
+        <td><span class="tag-yes">○ DALL-E / GPT Image</span></td>
+        <td><span class="tag-yes">◎ Nano Banana対応</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">動画生成</td>
+        <td><span class="tag-no">— 非対応</span></td>
+        <td><span class="tag-partial">△ Sora 2（制限あり）</span></td>
+        <td><span class="tag-yes">○ Veo 3.1対応</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">画像・文書の読み取り</td>
+        <td><span class="tag-yes">◎ 対応</span></td>
+        <td><span class="tag-yes">○ 対応</span></td>
+        <td><span class="tag-yes">○ 対応</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">AIエージェント機能</td>
+        <td><span class="tag-yes">◎ Claude Code / Cowork</span></td>
+        <td><span class="tag-yes">○ Codex（発展中）</span></td>
+        <td><span class="tag-partial">△ 開発者向けが中心</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">外部サービス連携</td>
+        <td><span class="tag-partial">○ MCP対応</span></td>
+        <td><span class="tag-yes">◎ エコシステム充実</span></td>
+        <td><span class="tag-yes">◎ Google Workspace直結</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">コーディング性能</td>
+        <td><span class="tag-yes">◎ 業界トップ評価</span></td>
+        <td><span class="tag-yes">○ 汎用性が高い</span></td>
+        <td><span class="tag-partial">○ Google系技術に強い</span></td>
+      </tr>
+      <tr>
+        <td class="feature-name">無料プランの充実度</td>
+        <td><span class="tag-yes">○ 充実</span></td>
+        <td><span class="tag-partial">△ 制限あり</span></td>
+        <td><span class="tag-yes">○ 充実</span></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

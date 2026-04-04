@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>これさえ知れば、Claudeを使いこなせる ～中級～</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --bg2: #EDEAE2;
+    --ink: #1A1714;
+    --ink2: #4A4540;
+    --ink3: #7A7570;
+    --accent: #2A4A8A;
+    --accent2: #4A7ACA;
+    --accent-light: #DDE4F5;
+    --teal: #2A7A6A;
+    --teal-light: #DDF0EB;
+    --gold: #B8860B;
+    --gold-light: #FDF5DC;
+    --red: #C85A2A;
+    --red-light: #FAE8DC;
+    --border: #D4CFC5;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  /* PROGRESS BAR */
+  #progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    z-index: 1000;
+    transition: width 0.1s;
+    width: 0%;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 80px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(42,74,138,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .badge-paid {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+
+  header h1 span { color: var(--accent2); }
+
+  .header-sub {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.65);
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-family: var(--mono);
+  }
+
+  .meta-dot {
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* NAV */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 3px;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .nav-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    font-size: 12.5px;
+    font-family: var(--mono);
+    color: var(--ink3);
+    text-decoration: none;
+    padding: 14px 18px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .nav-link.locked { color: var(--gold); }
+  .nav-link.locked:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* TOC */
+  .toc-wrap {
+    max-width: 860px;
+    margin: 48px auto 0;
+    padding: 0 40px;
+  }
+
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 32px 36px;
+  }
+
+  .toc h2 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 8px 32px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink2);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bg2);
+    transition: color 0.2s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+  .toc-item.locked-item { color: var(--ink3); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    width: 22px;
+    flex-shrink: 0;
+  }
+
+  .toc-item.locked-item .toc-num { color: var(--gold); }
+
+  .toc-lock {
+    font-size: 11px;
+    color: var(--gold);
+    margin-left: auto;
+    font-family: var(--mono);
+  }
+
+  /* MAIN */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  .section { margin-bottom: 80px; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .section h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .section h3 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 36px 0 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h3::before {
+    content: '';
+    display: block;
+    width: 4px; height: 18px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p { margin-bottom: 16px; color: var(--ink2); }
+  strong { color: var(--ink); font-weight: 700; }
+
+  /* CALLOUT */
+  .callout {
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 2px;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  .callout-tip { background: var(--teal-light); border-left: 4px solid var(--teal); color: #1A4A3A; }
+  .callout-warn { background: var(--gold-light); border-left: 4px solid var(--gold); color: #5A4000; }
+  .callout-info { background: var(--accent-light); border-left: 4px solid var(--accent); color: #1A2A5A; }
+
+  .callout-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    font-family: var(--mono);
+  }
+
+  /* PAYWALL */
+  .paywall {
+    background: var(--ink);
+    color: white;
+    padding: 60px 40px;
+    text-align: center;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .paywall::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(42,74,138,0.25) 0%, transparent 70%);
+  }
+
+  .paywall-lock {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  .paywall h3 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: white;
+  }
+
+  .paywall p {
+    color: rgba(255,255,255,0.65);
+    font-size: 14.5px;
+    margin-bottom: 28px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .paywall-price {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .price-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 20px 28px;
+    border-radius: 2px;
+    text-align: center;
+    min-width: 160px;
+  }
+
+  .price-box.recommended {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .price-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .price-box.recommended .price-label { color: rgba(255,255,255,0.85); }
+
+  .price-amount {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .price-note {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  .btn-buy {
+    display: inline-block;
+    background: var(--accent2);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border-radius: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-buy:hover { background: var(--accent); }
+
+  .paywall-features {
+    margin-top: 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-family: var(--mono);
+  }
+
+  /* PROMPT COMPARISON */
+  .prompt-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 640px) { .prompt-comparison { grid-template-columns: 1fr; } }
+
+  .prompt-bad, .prompt-good {
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    font-family: var(--mono);
+    border-radius: 2px;
+  }
+
+  .prompt-bad { background: var(--red-light); border-left: 3px solid var(--red); color: #7A2A10; }
+  .prompt-good { background: var(--teal-light); border-left: 3px solid var(--teal); color: #1A4A3A; }
+
+  .prompt-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  /* ROLE CARD */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .role-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 20px;
+  }
+
+  .role-card .role-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .role-card .role-example {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .role-card p { font-size: 12.5px; margin-bottom: 0; }
+
+  /* TEMPLATE LIST */
+  .template-section {
+    margin: 20px 0;
+  }
+
+  .template-category {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 28px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--accent-light);
+  }
+
+  .template-item {
+    background: white;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .template-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .template-header:hover { background: var(--bg2); }
+
+  .template-name {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .template-toggle {
+    font-size: 18px;
+    color: var(--ink3);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .template-item.open .template-toggle { transform: rotate(45deg); }
+
+  .template-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 20px;
+    background: var(--bg);
+  }
+
+  .template-item.open .template-body { display: block; }
+
+  .template-desc {
+    font-size: 13px;
+    color: var(--ink3);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .template-prompt {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    color: var(--ink2);
+    background: white;
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+    white-space: pre-wrap;
+    margin-bottom: 12px;
+  }
+
+  .btn-copy-tmpl {
+    background: var(--accent-light);
+    color: var(--accent);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .btn-copy-tmpl:hover { background: var(--accent); color: white; }
+
+  /* QUIZ */
+  .quiz {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin: 24px 0;
+  }
+
+  .quiz h4 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  .quiz-question {
+    font-size: 14.5px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--ink);
+    padding: 14px 18px;
+    background: var(--bg2);
+    border-left: 3px solid var(--accent);
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.55;
+  }
+
+  .quiz-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-option.correct { border-color: var(--teal); background: var(--teal-light); color: #1A4A3A; }
+  .quiz-option.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+
+  .quiz-opt-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg2);
+    padding: 2px 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .quiz-feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    display: none;
+    line-height: 1.65;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: var(--teal-light); border-left: 3px solid var(--teal); color: #1A4A3A; }
+  .quiz-feedback.ng { background: var(--red-light); border-left: 3px solid var(--red); color: #7A2A10; }
+
+  .quiz-next {
+    margin-top: 14px;
+    display: none;
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .quiz-next:hover { background: var(--accent); }
+  .quiz-next.show { display: inline-block; }
+
+  /* DIVIDER */
+  .divider { border: none; height: 1px; background: var(--border); margin: 48px 0; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  mark { background: var(--gold-light); color: var(--ink); padding: 1px 3px; border-radius: 2px; }
+
+  /* STEP LIST */
+  .step-list { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+
+  .step { display: flex; gap: 20px; position: relative; padding-bottom: 28px; }
+  .step:last-child { padding-bottom: 0; }
+
+  .step-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+
+  .step-circle {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .step-connector { width: 1px; flex: 1; background: var(--border); margin-top: 6px; min-height: 20px; }
+  .step:last-child .step-connector { display: none; }
+
+  .step-body h4 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  .step-body p { font-size: 13.5px; margin-bottom: 0; }
+
+  /* FADE IN */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.45);
+    padding: 40px;
+    text-align: center;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  footer a { color: var(--accent2); text-decoration: none; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    header { padding: 50px 20px 40px; }
+    .toc-wrap, main { padding-left: 20px; padding-right: 20px; }
+    .nav-inner { padding: 0 12px; }
+    .paywall { padding: 40px 20px; }
+  }
+
+  /* BEFORE/AFTER BOX */
+  .before-after {
+    background: white;
+    border: 1px solid var(--border);
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .ba-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ba-label.bad { background: var(--red-light); color: var(--red); }
+  .ba-label.good { background: var(--teal-light); color: var(--teal); }
+
+  .ba-content {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    padding: 16px 18px;
+    color: var(--ink2);
+    white-space: pre-wrap;
+  }
+
+  .ba-arrow {
+    text-align: center;
+    font-size: 20px;
+    color: var(--ink3);
+    padding: 8px;
+  }
+
+  /* TECHNIQUE CARD */
+  .technique-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .technique-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .technique-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .technique-card h4 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .technique-card p { font-size: 13px; margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="badge">中級 / Intermediate</div><div class="badge-paid">有料</div>
+    <h1>これさえ知れば、<span>Claude</span>を<br>使いこなせる <small style="font-size:0.55em; color:rgba(255,255,255,0.6); font-weight:300;">～中級～</small></h1>
+    <p class="header-sub">プロンプトを武器にする — 精度・速度・再現性を高める実践技術</p>
+    <div class="header-meta">
+      <div class="meta-item"><div class="meta-dot"></div>所要時間：約1.5時間</div>
+      <div class="meta-item"><div class="meta-dot"></div>対象：初級修了者</div>
+      <div class="meta-item"><div class="meta-dot"></div>テンプレート30種付き</div>
+      <div class="meta-item"><div class="meta-dot"></div>対話式クイズ：あり</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-link" href="#sec1">01 仕組みを知る</a>
+    <a class="nav-link locked" href="#paywall">02 役割指定 🔒</a>
+    <a class="nav-link locked" href="#paywall">03 修正道場 🔒</a>
+    <a class="nav-link locked" href="#paywall">04 壁打ち術 🔒</a>
+    <a class="nav-link locked" href="#paywall">05 上級技法 🔒</a>
+    <a class="nav-link locked" href="#paywall">06 テンプレート 🔒</a>
+    <a class="nav-link locked" href="#paywall">07 Excel活用 🔒</a>
+    <a class="nav-link locked" href="#paywall">08 クイズ 🔒</a>
+  </div>
+</nav>
+
+<!-- TOC -->
+<div class="toc-wrap">
+  <div class="toc">
+    <h2>📋 目次</h2>
+    <div class="toc-grid">
+      <a class="toc-item" href="#sec1"><span class="toc-num">01</span>なぜ同じ質問で答えが変わるのか</a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">02</span>役割指定（ロールプロンプト）の技術<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">03</span>失敗プロンプト修正道場<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">04</span>壁打ち術：会話を重ねてブラッシュアップ<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">05</span>Chain of Thought・構造化プロンプト<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">06</span>コピペで使える業務テンプレート30選<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">07</span>Excel・VBA・データ分析への活用<span class="toc-lock">🔒</span></a>
+      <a class="toc-item locked-item" href="#paywall"><span class="toc-num">08</span>理解度チェッククイズ<span class="toc-lock">🔒</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- SEC 1: 無料公開部分 -->
+  <section class="section fade-in" id="sec1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>なぜ同じ質問で答えが変わるのか</h2>
+    </div>
+
+    <p>初級編でClaudeの使い方を学んだあなたは、こんな経験をしたことがあるかもしれません。「同じことを聞いたのに、昨日とまったく違う答えが返ってきた」「もう少し良い答えを引き出せそうなのに、どう指示すればいいかわからない」。</p>
+
+    <p>中級編では、その「なぜ」を理解することから始めます。仕組みを知ることで、プロンプトの設計が直感から<strong>技術</strong>に変わります。</p>
+
+    <h3>Claude が答えを生成する仕組み</h3>
+
+    <p>Claudeを含む大規模言語モデル（LLM）は、<mark>「次に来る言葉として最も自然なものを確率的に選ぶ」</mark>という処理を繰り返して文章を生成しています。決して「理解して考えている」わけではなく、膨大なテキストから学習したパターンに基づいて出力しています。</p>
+
+    <p>これが意味することは2つです。</p>
+
+    <div class="technique-grid">
+      <div class="technique-card">
+        <div class="technique-num">含意 01</div>
+        <h4>文脈が多いほど精度が上がる</h4>
+        <p>「メールを書いて」より「〇〇の目的で、〇〇宛に、〇〇のトーンで書いて」の方が、期待通りの出力に近づきます。あいまいな指示はあいまいな答えを引き出します。</p>
+      </div>
+      <div class="technique-card">
+        <div class="technique-num">含意 02</div>
+        <h4>毎回同じ答えにはならない</h4>
+        <p>確率的な処理のため、同じプロンプトでも毎回微妙に異なる答えが返ります。再現性が必要なら、出力形式や条件を細かく指定することで安定させられます。</p>
+      </div>
+      <div class="technique-card">
+        <div class="technique-num">含意 03</div>
+        <h4>「どう聞くか」が品質を決める</h4>
+        <p>同じ情報を引き出すにも、質問の組み立て方で精度が大きく変わります。これがプロンプトエンジニアリングの本質です。</p>
+      </div>
+    </div>
+
+    <h3>初級と中級の違い</h3>
+
+    <p>初級では「何を・どんな形式で」伝えるかを学びました。中級では、さらに踏み込みます。</p>
+
+    <div class="prompt-comparison">
+      <div class="prompt-bad">
+        <div class="prompt-label">❌ 初級レベル</div>
+        取引先へのお断りメールを書いて。
+        敬語を使って200字で。
+      </div>
+      <div class="prompt-good">
+        <div class="prompt-label">✅ 中級レベル</div>
+        あなたは15年のキャリアを持つ
+        ベテラン秘書です。
+
+        以下の条件でお断りメールを
+        作成してください。
+
+        【宛先】山田商事 鈴木部長
+        【理由】社内会議との重複
+        【トーン】丁寧・簡潔・余地を残す
+        【字数】180〜220字
+        【禁止】「ご迷惑をおかけして」
+        　　　　の重複使用
+      </div>
+    </div>
+
+    <p>違いは「役割の付与」「制約の明示」「禁止事項の指定」の3点です。これらが中級の技術の核心です。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">✅ この章のポイント</div>
+      Claudeは確率的に文章を生成するため、<strong>「文脈・役割・制約」を与えるほど出力が安定する</strong>。中級編では、この3つを意図的にコントロールする技術を習得します。
+    </div>
+  </section>
+
+  <!-- PAYWALL -->
+  <div id="paywall" class="paywall">
+    <div style="position:relative; z-index:1;">
+      <div class="paywall-lock">🔒</div>
+      <h3>続きは有料版でお読みいただけます</h3>
+      <p>セクション02以降（役割指定・修正道場・壁打ち術・上級技法・テンプレート30選・Excel活用・クイズ）は、noteにて販売しています。</p>
+      <div class="paywall-price">
+        <div class="price-box">
+          <div class="price-label">中級編 単品</div>
+          <div class="price-amount">¥500</div>
+          <div class="price-note">本記事のみ</div>
+        </div>
+        <div class="price-box recommended">
+          <div class="price-label">中級＋上級 セット</div>
+          <div class="price-amount">¥800</div>
+          <div class="price-note">20% お得</div>
+        </div>
+      </div>
+      <a href="https://note.com/" class="btn-buy" target="_blank">note で購入する →</a>
+      <div class="paywall-features">
+        ✓ 購入後すぐに全文読めます &nbsp;｜&nbsp; ✓ 買い切り・更新料なし &nbsp;｜&nbsp; ✓ noteアカウントで管理
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-warn" style="margin-top:40px;">
+    <div class="callout-title">📖 初級編を読んでいない方へ</div>
+    中級編はClaudeの基礎知識（できること・プロンプトの基本）を前提としています。まだの方は<a href="../beginner/index.html" style="color:var(--gold); font-weight:700;">初級編（無料）</a>から始めてください。
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Claude 入門ガイド — 中級編 &nbsp;|&nbsp; Powered by <a href="https://anthropic.com" target="_blank">Anthropic</a> &nbsp;|&nbsp; <a href="https://note.com/" target="_blank">note で購入</a></p>
+</footer>
+
+<script>
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// FADE IN
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// NAV ACTIVE
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+  navLinks.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+  });
+});
+
+// TEMPLATE TOGGLE
+function toggleTemplate(id) {
+  const item = document.getElementById(id);
+  if (item) item.classList.toggle('open');
+}
+
+// COPY TEMPLATE
+function copyTemplate(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = el.parentElement.querySelector('.btn-copy-tmpl');
+    if (btn) { btn.textContent = '✓ コピーしました！'; setTimeout(() => { btn.textContent = '⧉ コピーする'; }, 2000); }
+  });
+}
+</script>
+</body>
+</html>
